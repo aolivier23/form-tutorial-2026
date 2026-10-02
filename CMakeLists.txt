@@ -1,0 +1,13 @@
+cmake_minimum_required(VERSION 3.31)
+project(form_tutorial VERSION 0.0.1 LANGUAGES CXX)
+
+set(CMAKE_CXX_STANDARD 23)
+
+find_package(Boost REQUIRED json)
+find_package(phlex REQUIRED)
+find_package(ROOT REQUIRED RIO)
+
+add_subdirectory(writing)
+
+configure_file(setup.sh.in setup.sh @ONLY)
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/setup.sh DESTINATION bin)

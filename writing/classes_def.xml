@@ -1,0 +1,4 @@
+<lcgdict>
+  <class name="raw::wire_readout"/>
+  <class name="std::vector<raw::wire_readout>"/>
+</lcgdict>
