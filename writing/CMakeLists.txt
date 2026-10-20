@@ -11,6 +11,8 @@ add_library(wire_readout SHARED $<TARGET_OBJECTS:wire_readout_obj>)
 reflex_generate_dictionary(wire_readout dict.h SELECTION classes_def.xml)
 target_link_libraries(wire_readout PRIVATE ROOT::RIO)
 install(TARGETS wire_readout DESTINATION lib)
+set_target_properties(wire_readout PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/wire_readout_rdict.pcm DESTINATION lib)
 
 #phlex provider plugin library
 add_library(simulate_wires_provider MODULE simulate_wires_provider.cpp)
