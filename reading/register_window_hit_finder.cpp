@@ -8,7 +8,7 @@
 
 PHLEX_REGISTER_PROVIDERS(graph, config)
 {
-  auto const pedestal = config.get<uint16_t>("pedestal", 5);
+  auto const pedestal = config.get<uint16_t>("pedestal", 60);
   graph.provide("fixed_pedestal", [pedestal]([[maybe_unused]] phlex::data_cell_index const& idx){ return pedestal; })
     .output_product(phlex::experimental::algorithm_name("fixed_pedestal"),
                     phlex::experimental::identifier("user_input"),
