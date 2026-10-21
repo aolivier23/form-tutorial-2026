@@ -16,15 +16,5 @@
     count_wires: {
      cpp: 'simulate_wires_provider',
     },
-    output: {
-      cpp: 'form_module',
-      outputs: {
-        sim_wires: {
-          output_file: 'form-tutorial-writing.root',
-          technology: 'ROOT_RNTUPLE',
-          products: ['sim',],
-        },
-      },
-    }
   },
 }

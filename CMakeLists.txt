@@ -9,7 +9,6 @@ find_package(phlex REQUIRED)
 find_package(ROOT REQUIRED RIO)
 
 add_subdirectory(writing)
-add_subdirectory(reading)
 
 configure_file(setup.sh.in setup.sh @ONLY)
 install(FILES ${CMAKE_CURRENT_BINARY_DIR}/setup.sh DESTINATION bin)
