@@ -2,7 +2,6 @@
 
 #include "simulate_wires.hpp"
 
-#include "phlex/form/form_source_type_registry.hpp"
 #include "phlex/source.hpp"
 #include "phlex/module.hpp"
 
@@ -27,9 +26,6 @@ class do_simulate_wires
 
 PHLEX_REGISTER_PROVIDERS(graph, config)
 {
-  //Register data product with FORM
-  form::experimental::register_form_vector_product_type<raw::wire_readout>("raw::wire_readout");
-
   //Configuration options from user
   auto const seed = config.get<size_t>("seed", static_cast<size_t>(std::chrono::system_clock::now().time_since_epoch().count()));
   auto const n_channels = config.get<size_t>("n_channels_per_apa", 1024);

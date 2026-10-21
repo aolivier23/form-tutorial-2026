@@ -17,7 +17,6 @@ PHLEX_REGISTER_PROVIDERS(graph, config)
 
 PHLEX_REGISTER_ALGORITHMS(graph, config)
 {
-  form::experimental::register_form_vector_product_type<reco::hit>("reco::hit");
   form::experimental::register_form_vector_product_type<raw::wire_readout>("raw::wire_readout");
 
   graph.transform("window_hit_finder", window_hit_finder)

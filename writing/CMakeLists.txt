@@ -17,5 +17,5 @@ install(FILES ${CMAKE_CURRENT_BINARY_DIR}/wire_readout_rdict.pcm DESTINATION lib
 #phlex provider plugin library
 add_library(simulate_wires_provider MODULE simulate_wires_provider.cpp)
 target_link_options(simulate_wires_provider PRIVATE "LINKER:--no-as-needed")
-target_link_libraries(simulate_wires_provider PRIVATE simulate_wires wire_readout phlex::module phlex::form)
+target_link_libraries(simulate_wires_provider PRIVATE simulate_wires wire_readout phlex::module)
 install(TARGETS simulate_wires_provider DESTINATION lib)
