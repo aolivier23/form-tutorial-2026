@@ -1,60 +1,106 @@
 # Writing a Data Product with FORM
-Particle physics reconstruction software in phlex is organized into *algorithms*.  One algorithm represents a single step in DUNE's multi-hour reconstruction procedure.  How algorithms communicate with each other is defined by the phlex framework.  phlex limits algorithms to communicating through only their python or c++ *return values* to give us benefits like:
-- simpler development and debugging
-- control of memory usage
-- saving algorithm results to a file
+This tutorial starts with:
+- a toy physics algorithm: `simulate_wires`
+- a toy data product produced by that algorithm: `wire_readout`
+- phlex components to run that algorithm: `simulate_wires_provider` and `write_wires.jsonnet`
+- a script to check the results: `plot_one_wire.py`
+- a CMake build system to put it all together
 
-A *data product* is the data type of the return value of an algorithm.  Particle physicists usually want to associate numbers, lists, etc. together in the output of an algorithm.  When working with phlex in c++ and python, we use classes to do this.  An example of a data product class is a `wire_readout`.  A single `wire_readout` represents one pixel in DUNE's horizontal drift far detector.  It has a channel number and a recorded waveform.  It's recorded in a particular anode plane assembly (APA) that we will later reconstruct all at once.  Take a look at `wire_readout.hpp` to see what a data product looks like in action!
+When you complete this tutorial, you will be able to:
+- configure phlex to write data products using FORM
+- write data products to a file that FORM can read
+- demonstrate that the data products in this FORM file contain plausible information
 
-To work with `wire_readout`s in phlex, we need an algorithm that produces them.  Since we're starting with an empty project and are saving file reading for later, we need an algorithm that acts as a phlex *provider* node.  A provider is a phlex higher-order function that takes no data products as input and returns data products as output.  It can still read from phlex configuration.  A provider just can't receive communication from other algorithms.  The way phlex organizes algorithms within a job is an acyclic graph, which can look a little like a tree when there's only one provider node.  In this example, the `simulate_wires` algorithm is like the root of that tree.
+**Try running `write_wires.jsonnet` now.**  The job should complete, but it
+won't produce an output file.
 
-`simulate_wires.cpp` defines an algorithm for creating wires from random numbers.  But it does *not* define a phlex higher order function yet.  One of the strengths of phlex is that physics logic is completely separate from communication with the framework.  `simulate_wires` could be re-used in a dedicated program to study systematic uncertainties completely outside of phlex, and nothing about this tutorial would need to change.  Take a look at `simulate_wires.hpp` and `simulate_wires.cpp` to see the physics logic for this exercise.
+## Configuring FORM
+`write_wires.jsonnet` drives phlex to run the `simulate_wires` algorithm.  But it doesn't save results to a file.  It can only pass data products to other algorithms in the same process.
 
-`simulate_wires_provider.cpp` actually ties the `simulate_wires` library in with the phlex framework.  It defines a higher order function, a provider, through which `simulate_wires` interacts with the framework.  `simulate_wires_provider.cpp` is also our chance to query the user for initialization information through the framework.  Finally, this file labels the wires produced by the `simulate_wires_provider` node so other algorithms can search for them in future exercises.
-
-phlex needs a configuration file to describe what job to run.  A phlex configuration file lists algorithms, in no particular order, and communicates initialization information like how many wires to simulate to that algorithm.  We're going to use a jsonnet file to configure phlex.  Jsonnet blends the simplicity of JSON with the human-friendliness features like comments, references, and limited arithmetic.  A phlex jsonnet configuration needs a *driver* block and a *modules* block.  The modules block is our chance to register the `simulate_wires_provider` node with the framework.  It takes a mandatory `cpp` or `python` argument that points phlex to a library.  Modules that use phlex's configuration system also list configuration parameters here.  Configuration parameters can include maps, lists, and nested data structures.
-
-In addition to `simulate_wires_provider`, we also schedule an `output` module.  This is how phlex communicates with files.  The `cpp` algorithm is always `form_module` at the time of writing.  `form_module` requires a `products` list of dictionaries where each product can define an `output_file`.  `form_module` identifies data products by their `suffix` which must go in a list named `products` for each file.  We also specify in this jsonnet file that we want to use the new `ROOT_RNTUPLE` file format `technology` to store these products instead of the default `ROOT_TTREE`.  `ROOT_RNTUPLE` files are often 10-30\% smaller than `ROOT_TTREE` files.
-
-Run a phlex job with this command:
-
+Use FORM by scheduling a special algorithm in a phlex configuration file like this:
 ```
-phlex -c form_writing_tutorial.jsonnet -j 1
-```
-
-It won't work!  The problem is that FORM needs to figure out how to convert a `wire_readout` into a binary representation in a file.  The ROOT toolkit's `RNTuple` component does almost all of the hard work for us.  We just have to create a *dictionary* any time we want to store a new data product in a file.  `classes_def.xml` configures ROOT to discover the data members of `wire_readout.cpp`.  We use it with a few special commands in `CMakeLists.txt`:
-
-```
-TODO: CMakeLists.txt for ROOT dictionary generation
-```
-
-ROOT also needs a list of headers to process: `dict.h`.  Finally, we need a special phlex module to register `wire_readout` with FORM: `register_wire_readout.cpp`.  There aren't many options to configure `register_wire_readout`, so you can copy this module around as you write new data products.
-
-Now try running the same phlex job again.  That should produce a `.root` file in your current directory.  `.root` files confuse the versioning system and use up our most expensive tier of storage at Fermilab rapidly.  So we'll try to only produce ROOT files in `/exp/dune/data/users/${USER}/form_tutorial`.  Move this file there, then let's look at what's inside!
-
-You can open a `.root` file with the ROOT toolkit's interpreter executable: `root -l form_writing_tutorial.root`.  The ROOT interpretter works a little like a combination of your command line shell and the command `python`.  But it interprets c++ instead of the python language!  You can use `root`'s shell like the bash shell to see what objects a ROOT file contains with `.ls`.  This should produce a list of objects as follows:
-
-```
-TODO
+output: {
+  cpp: 'form_module',
+  outputs: {
+    sim_wires: {
+      output_file: 'form-tutorial-writing.root',
+      technology: 'ROOT_RNTUPLE',
+      products: ['sim',],
+    },
+  },
+}
 ```
 
-Most `ROOT::RNTuple`s in the file correspond roughly to the data products produced by a single phlex node.  There's also a `TODO` RNTuple for the internal workings of FORM that we're going to ignore today.  An RNTuple is structured as a tree of *fields*.  Most top-level fields hold a single data product each.  Each RNTuple holds many *entries* in this tree of fields format.  So an RNTuple does a job similar to a Pandas dataframe in python but more focused on storing classes instead of collections of integers and floating point numbers.  We can list the fields in an RNTuple like this:
+**Add this code block to `write_wires.jsonnet` now.**  It needs to be at the same scope as the `count_wires` algorithm.  
+
+The `output` and `cpp: form_module` parts will always stay the same.  `sim_wires` defines a group of data products that phlex will write.  The name `sim_wires` does not need to match any other names and is only present for user convenience.  Each group of data products is written to the same `output_file`.  `technology` is the format in which those data products will be written.  The default is ROOT's `TTree` format.  This tutorial focuses on the new `RNTuple` format because it produces smaller files.
+
+`products` is a list of phlex **suffixes** whose data products will be written to this file.  The suffixes FORM is configured for match the second argument to `phlex::product_selector` on line 41 of `simulate_wires_provider.cpp`.  Suffixes look a little different for most other kinds of phlex higher order nodes.  The writing exercise in this tutorial will demonstrate how to save data products from a transform node.
+
+ **Run write_wires.jsonnet now: `phlex -c write_wires.jsonnet -j 1 --stage sim`**.  You should get output like this:
+```
+=== form_output_module::save_data_products ===
+Creator: wires_provider:simulated_wires
+Stage: sim
+Data cell: [spill:0, apa:0]
+Number of products: 1
+  Product: simulate_wires/sim
+root_rfield_write_container_imp::setup_write could not create column-wise storage for std::vector<raw::wire_readout, std::allocator<raw::wire_readout> >.  This class is probably using something obsolete like TLorentzVector.  Storing it in streamer mode to keep the application going.
+Wrote 1 products to FORM
+Simulated 1024 wires.
+
+=== form_output_module::save_data_products ===
+Creator: wires_provider:simulated_wires
+Stage: sim
+Data cell: [spill:0, apa:1]
+Number of products: 1
+  Product: simulate_wires/sim
+Wrote 1 products to FORM
+Simulated 1024 wires.
+```
+
+FORM is telling you that you're missing some ingredients for producing a readable file.  You can open `form-tutorial-writing.root` with `root -l form-tutorial-writing.root` and see that it contains something with `.ls`.  But `plot_one_wire.py` won't work yet, and the reading tutorial would crash if you ran it now.  You're missing a ROOT dictionary that tells FORM how to put data products back together from the contents of this file.
+
+## ROOT Dictionary
+When you use the `ROOT_TTree` or `ROOT_RNTuple` FORM technologies, you need to produce a ROOT dictionary for each data product that will be written to a file.
+
+Most of ROOT dictionary generation happens when you compile your data product into a library.  This tutorial uses CMake to compile and link c++ libraries.  Open `CMakeLists.txt` in this directory and **add these code blocks now after `install(TARGETS wire_readout DESTINATION lib):**
+```
+reflex_generate_dictionary(wire_readout dict.h SELECTION classes_def.xml)
+target_link_libraries(wire_readout PRIVATE ROOT::RIO)
+set_target_properties(wire_readout PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/wire_readout_rdict.pcm DESTINATION lib)
+```
+
+**Re-compile the tutorial and run `write_wires.jsonnet` again.**  The build system will tell you you're missing a few more files:
+- `classes_def.xml`: tells ROOT which classes to build dictionaries for
+- `dict.h`: headers for the classes in `classes_def.xml`
+
+**Create files that look like these:**
+### `classes_def.xml`
+```
+<lcgdict>
+  <class name="raw::wire_readout"/>
+  <class name="std::vector<raw::wire_readout>"/>
+</lcgdict>
 
 ```
-auto reader = ROOT::RNTupleReader::Open(*_file0, "TODO");
-reader->PrintInfo();
+
+### `dict.h`
+```
+#include "wire_readout.hpp"
+#include <vector>
 ```
 
-We can also print the contents of individual entries in an RNTuple.  This can be helpful when debugging a new algorithm.
-
+Once you add these two files, you'll need to **re-create the build directory**:
 ```
-reader->Show(0);
-```
-
-Let's histogram the `waveforms` values in this RNTuple.  It's convenient to visualize an RNTuple's contents using another tool from ROOT: `RDataFrame`.  `RDataFrame` takes that analogy to Pandas a few steps further.  We can write cuts and plot combinations of fields in a more "functional" style than would be possibly just writing a loop over the RNTuple ourselves.  Try running this code:
-
-```
-TODO: RDataFrame
+rm -rf opt/build
+mkdir -p opt/build
+cd opt/build
+cmake cmake ../../form-tutorial -DCMAKE_INSTALL_PREFIX=`pwd`/.. -DCMAKE_BUILD_TYPE=Release
+make install
 ```
 
-An interactive window should pop up with a histogram.  In this histogram, you can see what `simulate_wires` is doing.  It starts with a fake noise floor constructed from a few different frequencies of sine functions.  Then it layers gaussians on top of that floor randomly to simulate physics hits in a toy particle detector.  It's a very poor simulation for lots of reasons: it doesn't simulate any of the physics of the readout electronics that massively reduce noise, and it doesn't simulate charges moving past a conductor.  But it gets faux waveforms on screen with just enough features to be analyzed in the next exercise.
+Now **run `write_wires.jsonnet` again.**  The warning about streamer mode should be gone.  This should be a well-formed FORM file!  The reading tutorial will demonstrate how to use it.
+
+This tutorial will use some expert knowledge of how FORM works to check that the results make sense.  `plot_one_wire.py` draws only one of the simulated wires as a histogram that kind of looks like the old LArSoft event display.  **Run `python plot_one_wire.py form-tutorial-writing.root 0 13 243`.**  This should produce an image file named `waveform_spill_0_apa_13.png`.  You can view it from an ipython terminal and verify that it looks like a noise background with maybe a handful of Gaussian hits superimposed on top.
