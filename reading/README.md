@@ -71,7 +71,7 @@ The type `bool` is just the default type FORM's RNTuple backend assumes for a da
 FORM provides a special function template to register a data product for reading: `form::experimental::register_form_vector_product_type<>()`.  Use it by filling in the type of your data product both as a template argument and as a string like this:
 `form::experimental::register_form_vector_product_type<raw::wire_readout>("raw::wire_readout");`
 
-`register_form_vector_product_type<>()` has to be called from inside a phlex plugin registration macro.  You can write a dedicated phlex plugin that only registers a data product.  This is how many of the FORM CI tests work.  In this tutorial, **include it with the `window_hit_finder` plugin on line 20 of `register_window_hit_finder.cpp`.  Now rebuild the tutorial.  Try running `hits_from_fixed_pedestal.jsonnet` again.**  You should get an error message from phlex about a missing library symbol that looks something like this:
+`register_form_vector_product_type<>()` has to be called from inside a phlex plugin registration macro.  You can write a dedicated phlex plugin that only registers a data product.  This is how many of the FORM CI tests work.  In this tutorial, **include it with the `window_hit_finder` plugin on line 20 of `register_window_hit_finder.cpp`.  Also `#include` the header it comes from: `phlex/form/form_source_type_registry.hpp`.  Now rebuild the tutorial.  Try running `hits_from_fixed_pedestal.jsonnet` again.**  You should get an error message from phlex about a missing library symbol that looks something like this:
 ```
 Using configuration file: hits_from_fixed_pedestal.jsonnet
 [2026-10-22 12:46:22.257] [info] Number of worker threads: 1
