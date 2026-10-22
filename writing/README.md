@@ -35,7 +35,7 @@ output: {
 
 The `output` and `cpp: form_module` parts will always stay the same.  `sim_wires` defines a group of data products that phlex will write.  The name `sim_wires` does not need to match any other names and is only present for user convenience.  Each group of data products is written to the same `output_file`.  `technology` is the format in which those data products will be written.  The default is ROOT's `TTree` format.  This tutorial focuses on the new `RNTuple` format because it produces smaller files.
 
-`products` is a list of phlex **suffixes** whose data products will be written to this file.  The suffixes FORM is configured for match the second argument to `phlex::product_selector` on line 41 of `simulate_wires_provider.cpp`.  Suffixes look a little different for most other kinds of phlex higher order nodes.  The writing exercise in this tutorial will demonstrate how to save data products from a transform node.
+`products` is a list of phlex **suffixes** whose data products will be written to this file.  The suffixes FORM is configured for match the second argument to `output_product()` on line 41 of `simulate_wires_provider.cpp`.  Suffixes look a little different for most other kinds of phlex higher order nodes.  The writing exercise in this tutorial will demonstrate how to save data products from a transform node.
 
  **Run write_wires.jsonnet now: `phlex -c write_wires.jsonnet -j 1 --stage sim`**.  You should get output like this:
 ```
@@ -72,7 +72,15 @@ set_target_properties(wire_readout PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${CMAKE_C
 install(FILES ${CMAKE_CURRENT_BINARY_DIR}/wire_readout_rdict.pcm DESTINATION lib)
 ```
 
-**Re-compile the tutorial and run `write_wires.jsonnet` again.**  The build system will tell you you're missing a few more files:
+**Re-compile the tutorial like this:**
+```
+cd form-tutorial-2026-opt/build
+make install
+```
+
+You'll have to do this each time you edit a file.  The jsonnet file is an exception to this rule.
+
+**Run `write_wires.jsonnet` again.**  The build system will tell you you're missing a few more files:
 - `classes_def.xml`: tells ROOT which classes to build dictionaries for
 - `dict.h`: headers for the classes in `classes_def.xml`
 
@@ -97,7 +105,7 @@ Once you add these two files, you'll need to **re-create the build directory**:
 rm -rf opt/build
 mkdir -p opt/build
 cd opt/build
-cmake cmake ../../form-tutorial -DCMAKE_INSTALL_PREFIX=`pwd`/.. -DCMAKE_BUILD_TYPE=Release
+cmake ../../form-tutorial-2026 -DCMAKE_INSTALL_PREFIX=`pwd`/.. -DCMAKE_BUILD_TYPE=Release
 make install
 ```
 

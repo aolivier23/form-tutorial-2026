@@ -13,6 +13,12 @@ cmake ../../form-tutorial-2026 -DCMAKE_INSTALL_PREFIX=`pwd`/.. -DCMAKE_BUILD_TYP
 make install
 ```
 
+Once you've installed the tutorial, you have to set it up:
+- the first time you install
+- each time you log in to a new shell
+
+Setup instructions: `source form-tutorial-2026-opt/bin/setup.sh`
+
 # Exercises
 A series of walkthroughs explaining how to use phlex with FORM.  The `main` branch is an answer key.  One branch will be provided as the starting point for each exercise with a name like `exercise_reading`.  Feel free to peak at the answer key if you get stuck with `git diff main -- <file_name>` for a specific file or just `git diff main -- *` for a whole directory.
 

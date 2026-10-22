@@ -1,5 +1,5 @@
 #include "wire_readout.hpp"
-#include <numeric>
+#include <limits>
 
 namespace raw
 {
