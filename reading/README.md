@@ -4,7 +4,7 @@ In the "Writing a Data Product with FORM" tutorial, you:
 - configured phlex to write that data product to a file using FORM
 - wrote a ROOT dictionary so other programs can read that data product
 
-This tutorial introduces a second phlex algorithm, `window_hit_finder`, that reads `waveform_readout`s from the file at the end of the `writing` tutorial and writes a new data product, `hit`.  It also consumes a "pedestal" data product whose value we will hard-code for now.  You could run both algorithms in the same phlex job and skip file input (this might be interesting to try on your own).  Instead, this tutorial will walk you through reading `wire_readout`s from the previous tutorial's file and writing the new `hit` data product to a second file.
+This tutorial introduces a second phlex algorithm, `window_hit_finder`, that reads `wire_readout`s from the file at the end of the `writing` tutorial and writes a new data product, `hit`.  It also consumes a "pedestal" data product whose value we will hard-code for now.  You could run both algorithms in the same phlex job and skip file input (this might be interesting to try on your own).  Instead, this tutorial will walk you through reading `wire_readout`s from the previous tutorial's file and writing the new `hit` data product to a second file.
 
 ## Configuring phlex
 
