@@ -4,11 +4,13 @@ In the "Writing a Data Product with FORM" tutorial, you:
 - configured phlex to write that data product to a file using FORM
 - wrote a ROOT dictionary so other programs can read that data product
 
-This tutorial introduces a second phlex algorithm, `window_hit_finder`, that reads `waveform_readout`s from the file at the end of the `writing` tutorial and writes a new data product, `hit`.  It also consumes a "pedestal" data product whose value we will hard-code for now.  You could run both algorithms in the same phlex job and skip file input (this might be interesting to try on your own).  Instead, this tutorial will walk you through reading `wire_readout`s from the previous tutorial's file and writing the new `hit` data product to a second file.
+This tutorial introduces a second phlex algorithm, `window_hit_finder`, that reads `wire_readout`s from the file at the end of the `writing` tutorial and writes a new data product, `hit`.  It also consumes a "pedestal" data product whose value we will hard-code for now.  You could run both algorithms in the same phlex job and skip file input (this might be interesting to try on your own).  Instead, this tutorial will walk you through reading `wire_readout`s from the previous tutorial's file and writing the new `hit` data product to a second file.
+
+**Start with the ROOT file `form-tutorial-writing.root` from the writing tutorial in _this_ directory.**  You can either move it from where you ran the writing tutorial's phlex commands or re-run the now-complete writing tutorial like this: `phlex -c ../writing/write_wires.jsonnet -j 1 --stage sim`
 
 ## Configuring phlex
 
-**Try running `hits_from_fixed_pedestal.jsonnet` now:**
+**Try running this exercise's new configuration, `hits_from_fixed_pedestal.jsonnet`, now:**
 `phlex -c hits_from_fixed_pedestal.jsonnet -j 1 --stage hit_reco`
 
 phlex should tell you that it needs a source of a data product from layer "apa":
@@ -78,7 +80,7 @@ Using configuration file: hits_from_fixed_pedestal.jsonnet
 phlex: symbol lookup error: /exp/dune/app/users/aolivier/phlex_develop_sep2026/form-tutorial-opt/lib/libwindow_hit_finder_alg.so: undefined symbol: _ZN4form12experimental26register_form_product_typeENSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEEN5phlex12experimental7type_idERKSt9type_infoSt8functionIFSt10unique_ptrINS8_12product_baseESt14default_deleteISF_EEPKvRKS6_SM_EE
 ```
 
-Any phlex plugin that registers a data product needs to link against the `phlex::form` library.  **Edit line 17 of CMakeLists.txt to link against `phlex::form`.**  You can add it after `phlex::module`.  **Run `hits_from_fixed_pedestal.jsonnet`.**  Your phlex job should finish quickly!  But you don't have any way to check that it produced reasonable output.  You could add an `observer` plugin to print out information from the `hit`s you're producing.  But this is a great opportunity to practice registering a new data product for output.
+Any phlex plugin that registers a data product needs to link against the `phlex::form` library.  **Edit line 20 of CMakeLists.txt to link against `phlex::form`, then re-compile the project.**  You can add it after `phlex::module`.  **Run `hits_from_fixed_pedestal.jsonnet`.**  Your phlex job should finish quickly!  But you don't have any way to check that it produced reasonable output.  You could add an `observer` plugin to print out information from the `hit`s you're producing.  But this is a great opportunity to practice registering a new data product for output.
 
 ## Outputting Hits and Verifying Results
 First, **create a dictionary for the `hit` data product**.  The process should be very similar to what you learned in the `writing` tutorial.  You'll need a `classes_def.xml`, a `dict.h`, and some `CMakeLists.txt` changes to get it to work.  Peak at `git diff main` if you need some help.  You'll have to **re-compile the tutorial** after making these changes.
