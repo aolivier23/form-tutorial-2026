@@ -1,5 +1,8 @@
 // wire_readout: a waveform read from a single channel of a wire-based time projection chamber (TPC).
 
+#ifndef RAW_WIREREADOUT_HPP
+#define RAW_WIREREADOUT_HPP
+
 #include <vector>
 #include <cstdint>
 
@@ -24,3 +27,5 @@ namespace raw
       std::vector<ADC_t> waveform_;
   };
 }
+
+#endif //RAW_WIREREADOUT_HPP

@@ -10,7 +10,6 @@ add_library(hit SHARED $<TARGET_OBJECTS:hit_obj>)
 set_target_properties(hit PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
 
 install(TARGETS hit DESTINATION lib)
-install(FILES ${CMAKE_CURRENT_BINARY_DIR}/hit_rdict.pcm DESTINATION lib)
 
 #phlex provider and transform plugin library
 add_library(window_hit_finder_alg MODULE register_window_hit_finder.cpp)
