@@ -3,6 +3,7 @@
 #include "writing/wire_readout.hpp"
 
 #include <cmath>
+#include <algorithm>
 
 std::vector<reco::hit> window_hit_finder(std::vector<raw::wire_readout> const& wires, std::uint16_t const pedestal)
 {
