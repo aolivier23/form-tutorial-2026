@@ -74,7 +74,7 @@ install(FILES ${CMAKE_CURRENT_BINARY_DIR}/wire_readout_rdict.pcm DESTINATION lib
 
 **Re-compile the tutorial like this:**
 ```
-cd form-tutorial-2026-opt/build
+cd form-tutorial-2026/opt/build
 make install
 ```
 
@@ -102,10 +102,10 @@ You'll have to do this each time you edit a file.  The jsonnet file is an except
 
 Once you add these two files, you'll need to **re-create the build directory**:
 ```
-rm -rf opt/build
-mkdir -p opt/build
-cd opt/build
-cmake ../../form-tutorial-2026 -DCMAKE_INSTALL_PREFIX=`pwd`/.. -DCMAKE_BUILD_TYPE=Release
+rm -rf form-tutorial-2026/opt/build
+mkdir -p form-tutorial-2026/opt/build
+cd form-tutorial-2026/opt/build
+cmake ../.. -DCMAKE_INSTALL_PREFIX=`pwd`/.. -DCMAKE_BUILD_TYPE=Release
 make install
 ```
 
