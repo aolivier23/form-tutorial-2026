@@ -1,6 +1,15 @@
 # FORM Tutorial
 A tutorial on how to use the phlex framework's I/O system.  Demonstrates registering a data product with FORM, writing data products from phlex, reading data products into phlex, and eventually how FORM handles phlex's data cell hierarchies.  This tutorial develops a handful of toy phlex algorithms to generate data products that FORM can read and write.  These toy algorithms are not intended to have any physics content.
 
+## Run on the DUNE Tech JupyterHub
+
+Log in with GitHub at [![DUNE Tech JupyterHub](https://img.shields.io/badge/Log%20in-DUNE%20Tech%20JupyterHub-F37626?logo=jupyter&logoColor=white)](https://dune-tech.rice.edu/jupyterhub/), then click an exercise to clone its branch into your session and open its notebook:
+
+[![Exercise A: writing](https://img.shields.io/badge/Exercise%20A-writing.ipynb-2EA44F?logo=git&logoColor=white)](https://dune-tech.rice.edu/jupyterhub/hub/user-redirect/git-pull?repo=https%3A%2F%2Fgithub.com%2Faolivier23%2Fform-tutorial-2026&branch=exercise_writing&urlpath=lab%2Ftree%2Fform-tutorial-2026%2Fwriting%2Fwriting.ipynb)
+[![Exercise B: reading](https://img.shields.io/badge/Exercise%20B-reading.ipynb-2EA44F?logo=git&logoColor=white)](https://dune-tech.rice.edu/jupyterhub/hub/user-redirect/git-pull?repo=https%3A%2F%2Fgithub.com%2Faolivier23%2Fform-tutorial-2026&branch=exercise_reading&targetpath=form-tutorial-reading&urlpath=lab%2Ftree%2Fform-tutorial-reading%2Freading%2Freading.ipynb)
+
+In the notebook, pick the **phaindia apptainer** kernel (top right). It runs inside the tutorial's container, so phlex, CMake and ROOT are already there. The reading exercise is cloned into its own folder, `form-tutorial-reading`, so it doesn't clash with your writing work.
+
 # Installation
 `form-tutorial-2026` is provided as a CMake project that depends on phlex and ROOT.  Both packages are already provided in the container for the 2026 IISc tutorial.  `form-tutorial-2026` was tested as an out-of-source build.
 
